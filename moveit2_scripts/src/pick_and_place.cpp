@@ -242,20 +242,24 @@ int main(int argc, char **argv) {
 
   // Place
 
-//   RCLCPP_INFO(LOGGER, "Rotating Arm");
+  RCLCPP_INFO(LOGGER, "Rotating Arm");
 
-//   current_state_arm = move_group_arm.getCurrentState(10);
-//   current_state_arm->copyJointGroupPositions(joint_model_group_arm,
-//                                              joint_group_positions_arm);
+  geometry_msgs::msg::Pose target_pose2;
+  target_pose2.orientation.x = 0.0;
+  target_pose2.orientation.y = 1.0;
+  target_pose2.orientation.z = 0.0;
+  target_pose2.orientation.w = 0.0;
 
-//   joint_group_positions_arm[0] = 2.355; // Shoulder Pan
+  target_pose2.position.x = -0.34;
+  target_pose2.position.y = 0.0255;
+  target_pose2.position.z = 0.165;
 
-//   move_group_arm.setJointValueTarget(joint_group_positions_arm);
+  move_group_arm.setPoseTarget(target_pose2);
 
-//   success_arm = (move_group_arm.plan(my_plan_arm) ==
-//                  moveit::core::MoveItErrorCode::SUCCESS);
+  success_arm = (move_group_arm.plan(my_plan_arm) ==
+                 moveit::core::MoveItErrorCode::SUCCESS);
 
-//   move_group_arm.execute(my_plan_arm);
+  move_group_arm.execute(my_plan_arm);
 
   // Open Gripper
 
