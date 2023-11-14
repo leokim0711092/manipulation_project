@@ -144,19 +144,25 @@ int main(int argc, char **argv) {
   RCLCPP_INFO(LOGGER, "Pregrasp Position");
 
   geometry_msgs::msg::Pose target_pose1;
-  target_pose1.orientation.x = -1;
+  target_pose1.orientation.x = 1;
   target_pose1.orientation.y = 0.0;
   target_pose1.orientation.z = 0.0;
   target_pose1.orientation.w = 0.0;
+//   target_pose1.position.x = 0.34;
+//   target_pose1.position.y = 0.02;
+//   target_pose1.position.z = 0.09;
   target_pose1.position.x = 0.34;
   target_pose1.position.y = 0.02;
-  target_pose1.position.z = 0.04229;
+  target_pose1.position.z = 0.36;
+//   target_pose1.position.x = 0.34;
+//   target_pose1.position.y = 0.075;
+//   target_pose1.position.z = 0.388;
   move_group_arm.setPoseTarget(target_pose1);
 
   success_arm = (move_group_arm.plan(my_plan_arm) ==
                  moveit::core::MoveItErrorCode::SUCCESS);
 
-//   move_group_arm.execute(my_plan_arm);
+  move_group_arm.execute(my_plan_arm);
 
   //   Open Gripper
 
