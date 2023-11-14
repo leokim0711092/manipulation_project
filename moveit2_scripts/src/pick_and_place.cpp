@@ -173,7 +173,7 @@ int main(int argc, char **argv) {
 
   target_pose1.position.x = 0.34;
   target_pose1.position.y = -0.0255;
-  target_pose1.position.z = 0.165;
+  target_pose1.position.z = 0.225;
 
   move_group_arm.setPoseTarget(target_pose1);
 
@@ -189,26 +189,29 @@ int main(int argc, char **argv) {
   remove_object.operation = remove_object.REMOVE;
   std::vector<std::string> object_ids;
   object_ids.push_back("cube");
-  planning_scene_interface_3.removeCollisionObjects(object_ids);
+  
 
   // Approach
-  //   RCLCPP_INFO(LOGGER, "Approach to object!");
+    RCLCPP_INFO(LOGGER, "Approach to object!");
 
-  //   std::vector<geometry_msgs::msg::Pose> approach_waypoints;
-  //   target_pose1.position.z -= 0.03;
-  //   approach_waypoints.push_back(target_pose1);
+    std::vector<geometry_msgs::msg::Pose> approach_waypoints;
+    target_pose1.position.z -= 0.03;
+    approach_waypoints.push_back(target_pose1);
 
-  //   target_pose1.position.z -= 0.03;
-  //   approach_waypoints.push_back(target_pose1);
+    target_pose1.position.z -= 0.03;
+    approach_waypoints.push_back(target_pose1);
 
-  //   moveit_msgs::msg::RobotTrajectory trajectory_approach;
-  //   const double jump_threshold = 0.0;
-  //   const double eef_step = 0.01;
+    moveit_msgs::msg::RobotTrajectory trajectory_approach;
+    const double jump_threshold = 0.0;
+    const double eef_step = 0.01;
 
-  //   double fraction = move_group_arm.computeCartesianPath(
-  //       approach_waypoints, eef_step, jump_threshold, trajectory_approach);
+    double fraction = move_group_arm.computeCartesianPath(
+        approach_waypoints, eef_step, jump_threshold, trajectory_approach);
 
-  //   move_group_arm.execute(trajectory_approach);
+    move_group_arm.execute(trajectory_approach);
+
+  //   Remove  Collision Object
+    planning_scene_interface_3.removeCollisionObjects(object_ids);
 
   //   Close Gripper
 
@@ -218,27 +221,27 @@ int main(int argc, char **argv) {
 
   moveit::planning_interface::MoveGroupInterface::Plan my_plan_gripper;
   bool success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-                     moveit::core::MoveItErrorCode::SUCCESS);
+                          moveit::core::MoveItErrorCode::SUCCESS);
 
   move_group_gripper.execute(my_plan_gripper);
 
-  //   // Retreat
+  //  Retreat
 
-    // RCLCPP_INFO(LOGGER, "Retreat from object!");
+  RCLCPP_INFO(LOGGER, "Retreat from object!");
 
-    // std::vector<geometry_msgs::msg::Pose> retreat_waypoints;
-    // target_pose1.position.z += 0.03;
-    // retreat_waypoints.push_back(target_pose1);
+  std::vector<geometry_msgs::msg::Pose> retreat_waypoints;
+  target_pose1.position.z += 0.03;
+  retreat_waypoints.push_back(target_pose1);
 
-    // target_pose1.position.z += 0.03;
-    // retreat_waypoints.push_back(target_pose1);
+  target_pose1.position.z += 0.03;
+  retreat_waypoints.push_back(target_pose1);
 
-    // moveit_msgs::msg::RobotTrajectory trajectory_retreat;
+  moveit_msgs::msg::RobotTrajectory trajectory_retreat;
 
-    // fraction = move_group_arm.computeCartesianPath(
-    //     retreat_waypoints, eef_step, jump_threshold, trajectory_retreat);
+  fraction = move_group_arm.computeCartesianPath(
+      retreat_waypoints, eef_step, jump_threshold, trajectory_retreat);
 
-    // move_group_arm.execute(trajectory_retreat);
+  move_group_arm.execute(trajectory_retreat);
 
   // Place
 
@@ -263,14 +266,14 @@ int main(int argc, char **argv) {
 
   // Open Gripper
 
-  //   RCLCPP_INFO(LOGGER, "Release Object!");
+  RCLCPP_INFO(LOGGER, "Release Object!");
 
-  //   move_group_gripper.setNamedTarget("open");
+  move_group_gripper.setNamedTarget("open");
 
-  //   success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-  //                      moveit::core::MoveItErrorCode::SUCCESS);
+  success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
+                     moveit::core::MoveItErrorCode::SUCCESS);
 
-  //   move_group_gripper.execute(my_plan_gripper);
+  move_group_gripper.execute(my_plan_gripper);
 
   rclcpp::shutdown();
   return 0;
