@@ -152,8 +152,8 @@ int main(int argc, char **argv) {
 //   target_pose1.position.y = 0.02;
 //   target_pose1.position.z = 0.09;
   target_pose1.position.x = 0.34;
-  target_pose1.position.y = 0.02;
-  target_pose1.position.z = 0.36;
+  target_pose1.position.y = -0.025;
+  target_pose1.position.z = 0.15;
 //   target_pose1.position.x = 0.34;
 //   target_pose1.position.y = 0.075;
 //   target_pose1.position.z = 0.388;
