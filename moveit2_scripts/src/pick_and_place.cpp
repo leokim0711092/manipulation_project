@@ -51,8 +51,6 @@ int main(int argc, char **argv) {
 
 
 
-//   move_group_arm.execute(my_plan_arm);
-
   // Create collision object for the robot to avoid
   auto const collision_object = [frame_id =
                                      move_group_arm.getPlanningFrame()] {
@@ -115,25 +113,52 @@ int main(int argc, char **argv) {
     return collision_object_1;
   }();
 
+  // Create collision object for the robot to avoid
+    auto const collision_object_cube = [frame_id =
+                                     move_group_arm.getPlanningFrame()] {
+    moveit_msgs::msg::CollisionObject collision_object;
+    collision_object.header.frame_id = frame_id;
+    collision_object.id = "cube";
+    shape_msgs::msg::SolidPrimitive primitive;
+
+    // Define the size of the box in meters
+    primitive.type = primitive.BOX;
+    primitive.dimensions.resize(3);
+    primitive.dimensions[primitive.BOX_X] = 0.02;
+    primitive.dimensions[primitive.BOX_Y] = 0.02;
+    primitive.dimensions[primitive.BOX_Z] = 0.06;
+
+    // Define the pose of the box (relative to the frame_id)
+    geometry_msgs::msg::Pose box_pose;
+    box_pose.orientation.w =
+        1.0; // We can leave out the x, y, and z components of the quaternion
+             // since they are initialized to 0
+    box_pose.position.x = 0.34;
+    box_pose.position.y = -0.0255;
+    box_pose.position.z = 0.03;
+
+    collision_object.primitives.push_back(primitive);
+    collision_object.primitive_poses.push_back(box_pose);
+    collision_object.operation = collision_object.ADD;
+
+    return collision_object;
+  }();
+
   // Add the collision object to the scene
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface_2;
+  moveit::planning_interface::PlanningSceneInterface planning_scene_interface_3;
+
   planning_scene_interface.applyCollisionObject(collision_object);
   planning_scene_interface_2.applyCollisionObject(collision_object_table);
+  planning_scene_interface_3.applyCollisionObject(collision_object_cube);
+
   RCLCPP_INFO(LOGGER, "Create Collision");
 
 
   // Go Home
   RCLCPP_INFO(LOGGER, "Going Home");
 
-//   joint_group_positions_arm[0] = -6.32;  // Shoulder Pan
-//   joint_group_positions_arm[1] = -2.50; // Shoulder Lift
-//   joint_group_positions_arm[2] = 1.50;  // Elbow
-//   joint_group_positions_arm[3] = -1.50; // Wrist 1
-//   joint_group_positions_arm[4] = -4.0; // Wrist 2
-//   joint_group_positions_arm[5] = -1.5;  // Wrist 3
-
-//   move_group_arm.setJointValueTarget(joint_group_positions_arm);
   move_group_arm.setNamedTarget("home");
 
   moveit::planning_interface::MoveGroupInterface::Plan my_plan_arm;
@@ -152,8 +177,8 @@ int main(int argc, char **argv) {
 //   target_pose1.position.y = 0.02;
 //   target_pose1.position.z = 0.09;
   target_pose1.position.x = 0.34;
-  target_pose1.position.y = -0.025;
-  target_pose1.position.z = 0.15;
+  target_pose1.position.y = -0.0255;
+  target_pose1.position.z = 0.165;
 //   target_pose1.position.x = 0.34;
 //   target_pose1.position.y = 0.075;
 //   target_pose1.position.z = 0.388;
@@ -164,17 +189,14 @@ int main(int argc, char **argv) {
 
   move_group_arm.execute(my_plan_arm);
 
-  //   Open Gripper
+  /* First, define the REMOVE object message*/
+moveit_msgs::msg::CollisionObject remove_object;
+remove_object.id = "cube";
+remove_object.header.frame_id = "world";
+remove_object.operation = remove_object.REMOVE;
+std::vector<std::string> object_ids; object_ids.push_back("cube");
+planning_scene_interface_3.removeCollisionObjects(object_ids);
 
-  //   RCLCPP_INFO(LOGGER, "Open Gripper!");
-
-  //   move_group_gripper.setNamedTarget("open");
-
-  //   moveit::planning_interface::MoveGroupInterface::Plan my_plan_gripper;
-  //   bool success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-  //                           moveit::core::MoveItErrorCode::SUCCESS);
-
-  //   move_group_gripper.execute(my_plan_gripper);
 
   // Approach
   //   RCLCPP_INFO(LOGGER, "Approach to object!");
