@@ -152,18 +152,6 @@ int main(int argc, char **argv) {
 
   RCLCPP_INFO(LOGGER, "Create Collision");
 
-  //   Close Gripper
-
-  RCLCPP_INFO(LOGGER, "Close Gripper!");
-
-  move_group_gripper.setNamedTarget("close");
-
-  moveit::planning_interface::MoveGroupInterface::Plan my_plan_gripper;
-  bool success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-                          moveit::core::MoveItErrorCode::SUCCESS);
-
-  move_group_gripper.execute(my_plan_gripper);
-
   // Go Home
   RCLCPP_INFO(LOGGER, "Going Home");
 
@@ -178,7 +166,7 @@ int main(int argc, char **argv) {
   RCLCPP_INFO(LOGGER, "Pregrasp Position");
 
   geometry_msgs::msg::Pose target_pose1;
-  target_pose1.orientation.x = 1.0;
+  target_pose1.orientation.x = 1;
   target_pose1.orientation.y = 0.0;
   target_pose1.orientation.z = 0.0;
   target_pose1.orientation.w = 0.0;
@@ -203,26 +191,13 @@ int main(int argc, char **argv) {
   object_ids.push_back("cube");
   
 
-    // Open Gripper
-
-  RCLCPP_INFO(LOGGER, "Open Gripper");
-
-  move_group_gripper.setNamedTarget("open");
-
-  success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-                     moveit::core::MoveItErrorCode::SUCCESS);
-
-  move_group_gripper.execute(my_plan_gripper);
-
   // Approach
     RCLCPP_INFO(LOGGER, "Approach to object!");
 
     std::vector<geometry_msgs::msg::Pose> approach_waypoints;
-    // target_pose1.position.z -= 0.10;
     target_pose1.position.z -= 0.03;
     approach_waypoints.push_back(target_pose1);
 
-    // target_pose1.position.z -= 0.10;
     target_pose1.position.z -= 0.03;
     approach_waypoints.push_back(target_pose1);
 
@@ -244,7 +219,8 @@ int main(int argc, char **argv) {
 
   move_group_gripper.setNamedTarget("close");
 
-  success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
+  moveit::planning_interface::MoveGroupInterface::Plan my_plan_gripper;
+  bool success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
                           moveit::core::MoveItErrorCode::SUCCESS);
 
   move_group_gripper.execute(my_plan_gripper);
@@ -254,11 +230,9 @@ int main(int argc, char **argv) {
   RCLCPP_INFO(LOGGER, "Retreat from object!");
 
   std::vector<geometry_msgs::msg::Pose> retreat_waypoints;
-//   target_pose1.position.z += 0.10;
   target_pose1.position.z += 0.03;
   retreat_waypoints.push_back(target_pose1);
 
-//   target_pose1.position.z += 0.10;
   target_pose1.position.z += 0.03;
   retreat_waypoints.push_back(target_pose1);
 
@@ -268,18 +242,6 @@ int main(int argc, char **argv) {
       retreat_waypoints, eef_step, jump_threshold, trajectory_retreat);
 
   move_group_arm.execute(trajectory_retreat);
-
-///////////For test need to be deleted after submitt the Close Gripper
-// For real
-//   RCLCPP_INFO(LOGGER, "Close Gripper!");
-
-//   move_group_gripper.setNamedTarget("close");
-
-//   success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-//                           moveit::core::MoveItErrorCode::SUCCESS);
-
-//   move_group_gripper.execute(my_plan_gripper);
-//////////////////////////////////////////////////////////////////////////
 
   // Place
 
@@ -292,6 +254,7 @@ int main(int argc, char **argv) {
   else joint_group_positions_arm[0] -= 3.14;
 
   move_group_arm.setJointValueTarget(joint_group_positions_arm);
+
   success_arm = (move_group_arm.plan(my_plan_arm) ==
                  moveit::core::MoveItErrorCode::SUCCESS);
 
