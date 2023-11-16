@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
         1.0; // We can leave out the x, y, and z components of the quaternion
              // since they are initialized to 0
     box_pose.position.x = 0.34;
-    box_pose.position.y = 0.132;
+    box_pose.position.y = -0.0255;
     box_pose.position.z = 0.03;
 
     collision_object.primitives.push_back(primitive);
@@ -178,14 +178,14 @@ int main(int argc, char **argv) {
   RCLCPP_INFO(LOGGER, "Pregrasp Position");
 
   geometry_msgs::msg::Pose target_pose1;
-  target_pose1.orientation.x = 0.7;
-  target_pose1.orientation.y = 0.7;
+  target_pose1.orientation.x = 1.0;
+  target_pose1.orientation.y = 0.0;
   target_pose1.orientation.z = 0.0;
   target_pose1.orientation.w = 0.0;
 
-  target_pose1.position.x = 0.343;
-  target_pose1.position.y = 0.132;
-  target_pose1.position.z = 0.30;
+  target_pose1.position.x = 0.34;
+  target_pose1.position.y = -0.0255;
+  target_pose1.position.z = 0.225;
 
   move_group_arm.setPoseTarget(target_pose1);
 
@@ -218,10 +218,12 @@ int main(int argc, char **argv) {
     RCLCPP_INFO(LOGGER, "Approach to object!");
 
     std::vector<geometry_msgs::msg::Pose> approach_waypoints;
-    target_pose1.position.z -= 0.10;
+    // target_pose1.position.z -= 0.10;
+    target_pose1.position.z -= 0.03;
     approach_waypoints.push_back(target_pose1);
 
-    target_pose1.position.z -= 0.10;
+    // target_pose1.position.z -= 0.10;
+    target_pose1.position.z -= 0.03;
     approach_waypoints.push_back(target_pose1);
 
     moveit_msgs::msg::RobotTrajectory trajectory_approach;
@@ -236,27 +238,28 @@ int main(int argc, char **argv) {
   //   Remove  Collision Object
     planning_scene_interface_3.removeCollisionObjects(object_ids);
 
-//   //   Close Gripper
+  //   Close Gripper
 
-//   RCLCPP_INFO(LOGGER, "Close Gripper!");
+  RCLCPP_INFO(LOGGER, "Close Gripper!");
 
-//   move_group_gripper.setNamedTarget("close");
+  move_group_gripper.setNamedTarget("close");
 
-//   moveit::planning_interface::MoveGroupInterface::Plan my_plan_gripper;
-//   bool success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-//                           moveit::core::MoveItErrorCode::SUCCESS);
+  success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
+                          moveit::core::MoveItErrorCode::SUCCESS);
 
-//   move_group_gripper.execute(my_plan_gripper);
+  move_group_gripper.execute(my_plan_gripper);
 
   //  Retreat
 
   RCLCPP_INFO(LOGGER, "Retreat from object!");
 
   std::vector<geometry_msgs::msg::Pose> retreat_waypoints;
-  target_pose1.position.z += 0.10;
+//   target_pose1.position.z += 0.10;
+  target_pose1.position.z += 0.03;
   retreat_waypoints.push_back(target_pose1);
 
-  target_pose1.position.z += 0.10;
+//   target_pose1.position.z += 0.10;
+  target_pose1.position.z += 0.03;
   retreat_waypoints.push_back(target_pose1);
 
   moveit_msgs::msg::RobotTrajectory trajectory_retreat;
@@ -267,33 +270,28 @@ int main(int argc, char **argv) {
   move_group_arm.execute(trajectory_retreat);
 
 ///////////For test need to be deleted after submitt the Close Gripper
+// For real
+//   RCLCPP_INFO(LOGGER, "Close Gripper!");
 
-  RCLCPP_INFO(LOGGER, "Close Gripper!");
+//   move_group_gripper.setNamedTarget("close");
 
-  move_group_gripper.setNamedTarget("close");
+//   success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
+//                           moveit::core::MoveItErrorCode::SUCCESS);
 
-  success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-                          moveit::core::MoveItErrorCode::SUCCESS);
-
-  move_group_gripper.execute(my_plan_gripper);
+//   move_group_gripper.execute(my_plan_gripper);
 //////////////////////////////////////////////////////////////////////////
 
   // Place
 
   RCLCPP_INFO(LOGGER, "Rotating Arm");
 
-  geometry_msgs::msg::Pose target_pose2;
-  target_pose2.orientation.x = 0.0;
-  target_pose2.orientation.y = 1.0;
-  target_pose2.orientation.z = 0.0;
-  target_pose2.orientation.w = 0.0;
+  current_state_arm = move_group_arm.getCurrentState(10);
+  current_state_arm->copyJointGroupPositions(joint_model_group_arm,
+                                             joint_group_positions_arm);
+  if( joint_group_positions_arm[0] < 0) joint_group_positions_arm[0] += 3.14; // Shoulder Pan
+  else joint_group_positions_arm[0] -= 3.14;
 
-  target_pose2.position.x = -0.343;
-  target_pose2.position.y = 0.132;
-  target_pose2.position.z = 0.25;
-
-  move_group_arm.setPoseTarget(target_pose2);
-
+  move_group_arm.setJointValueTarget(joint_group_positions_arm);
   success_arm = (move_group_arm.plan(my_plan_arm) ==
                  moveit::core::MoveItErrorCode::SUCCESS);
 
