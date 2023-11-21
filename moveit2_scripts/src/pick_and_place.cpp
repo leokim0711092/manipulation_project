@@ -201,9 +201,8 @@ int main(int argc, char **argv) {
   remove_object.operation = remove_object.REMOVE;
   std::vector<std::string> object_ids;
   object_ids.push_back("cube");
-  
 
-    // Open Gripper
+  // Open Gripper
 
   RCLCPP_INFO(LOGGER, "Open Gripper");
 
@@ -215,26 +214,26 @@ int main(int argc, char **argv) {
   move_group_gripper.execute(my_plan_gripper);
 
   // Approach
-    RCLCPP_INFO(LOGGER, "Approach to object!");
+  RCLCPP_INFO(LOGGER, "Approach to object!");
 
-    std::vector<geometry_msgs::msg::Pose> approach_waypoints;
-    target_pose1.position.z -= 0.10;
-    approach_waypoints.push_back(target_pose1);
+  std::vector<geometry_msgs::msg::Pose> approach_waypoints;
+  target_pose1.position.z -= 0.14;
+  approach_waypoints.push_back(target_pose1);
 
-    target_pose1.position.z -= 0.10;
-    approach_waypoints.push_back(target_pose1);
+  target_pose1.position.z -= 0.14;
+  approach_waypoints.push_back(target_pose1);
 
-    moveit_msgs::msg::RobotTrajectory trajectory_approach;
-    const double jump_threshold = 0.0;
-    const double eef_step = 0.01;
+  moveit_msgs::msg::RobotTrajectory trajectory_approach;
+  const double jump_threshold = 0.0;
+  const double eef_step = 0.01;
 
-    double fraction = move_group_arm.computeCartesianPath(
-        approach_waypoints, eef_step, jump_threshold, trajectory_approach);
+  double fraction = move_group_arm.computeCartesianPath(
+      approach_waypoints, eef_step, jump_threshold, trajectory_approach);
 
-    move_group_arm.execute(trajectory_approach);
+  move_group_arm.execute(trajectory_approach);
 
   //   Remove  Collision Object
-    planning_scene_interface_3.removeCollisionObjects(object_ids);
+  planning_scene_interface_3.removeCollisionObjects(object_ids);
 
   //   Close Gripper
 
@@ -243,19 +242,19 @@ int main(int argc, char **argv) {
   move_group_gripper.setNamedTarget("close");
 
   success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-                          moveit::core::MoveItErrorCode::SUCCESS);
+                     moveit::core::MoveItErrorCode::SUCCESS);
 
   move_group_gripper.execute(my_plan_gripper);
 
-  //  Retreat
+  //    Retreat
 
   RCLCPP_INFO(LOGGER, "Retreat from object!");
 
   std::vector<geometry_msgs::msg::Pose> retreat_waypoints;
-  target_pose1.position.z += 0.10;
+  target_pose1.position.z += 0.20;
   retreat_waypoints.push_back(target_pose1);
 
-  target_pose1.position.z += 0.10;
+  target_pose1.position.z += 0.20;
   retreat_waypoints.push_back(target_pose1);
 
   moveit_msgs::msg::RobotTrajectory trajectory_retreat;
@@ -265,17 +264,18 @@ int main(int argc, char **argv) {
 
   move_group_arm.execute(trajectory_retreat);
 
-// // ///////////For test need to be deleted after submitt the Close Gripper
+  // // ///////////For test need to be deleted after submitt the Close Gripper
 
-// //   RCLCPP_INFO(LOGGER, "Close Gripper!");
+  // //   RCLCPP_INFO(LOGGER, "Close Gripper!");
 
-// //   move_group_gripper.setNamedTarget("close");
+  // //   move_group_gripper.setNamedTarget("close");
 
-// //   success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
-// //                           moveit::core::MoveItErrorCode::SUCCESS);
+  // //   success_gripper = (move_group_gripper.plan(my_plan_gripper) ==
+  // //                           moveit::core::MoveItErrorCode::SUCCESS);
 
-// //   move_group_gripper.execute(my_plan_gripper);
-// // //////////////////////////////////////////////////////////////////////////
+  // //   move_group_gripper.execute(my_plan_gripper);
+  // //
+  // //////////////////////////////////////////////////////////////////////////
 
   // Rotate
 
@@ -284,8 +284,9 @@ int main(int argc, char **argv) {
   current_state_arm = move_group_arm.getCurrentState(10);
   current_state_arm->copyJointGroupPositions(joint_model_group_arm,
                                              joint_group_positions_arm);
-  if( joint_group_positions_arm[0] < 0) joint_group_positions_arm[0] += 3.14; // Shoulder Pan
-  else joint_group_positions_arm[0] -= 3.14;
+  if (joint_group_positions_arm[0] < 0)
+    joint_group_positions_arm[0] +=
+        3.14; // Shoulder Pan else joint_group_positions_arm[0] -= 3.14;
 
   move_group_arm.setJointValueTarget(joint_group_positions_arm);
 
